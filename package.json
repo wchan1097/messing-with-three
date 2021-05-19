@@ -18,6 +18,7 @@
   "homepage": "https://github.com/wchan1097/messing-with-three#readme",
   "dependencies": {
     "jquery": "^3.6.0",
+    "stats-js": "^1.0.1",
     "three": "^0.128.0"
   }
 }

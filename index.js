@@ -1,6 +1,27 @@
 var screenWidth = window.innerWidth;
 var screenHeight = window.innerHeight;
 
+/* ---------------------------- Functions ---------------------------- */
+
+function initStats(){
+  var stats = new Stats();
+  stats.setMode(0);
+  stats.domElement.style.position = "absolute";
+  stats.domElement.left = "0";
+  stats.domElement.top = "0";
+  $("#stats").append(stats.domElement);
+  return stats;
+}
+
+function render(){
+  stats.update();
+  cube.rotation.y += .05;
+  requestAnimationFrame(render);
+  renderer.render(scene, camera);
+}
+
+/* ------------------------------ Scene ------------------------------ */
+
 /**
  * Scene initialized. 
  */
@@ -26,7 +47,7 @@ var plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.receiveShadow = true;
 
 plane.rotation.x = -.5 * Math.PI;
-plane.position.x = 15;
+plane.position.x = 12;
 plane.position.y = 0;
 plane.position.z = 0;
 
@@ -78,15 +99,16 @@ scene.add(spotLight);
  * Camera element initialized. 
  */
 
-camera.position.x = -30;
-camera.position.y = 40;
-camera.position.z= 30;
+camera.position.x = -50;
+camera.position.y = 60;
+camera.position.z= 50;
 
 camera.lookAt(scene.position);
+var stats = initStats();
 
 /**
  * Render.
  */
 
 $("#webgl").append(renderer.domElement);
-renderer.render(scene, camera);
+render();
