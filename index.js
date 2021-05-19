@@ -1,5 +1,12 @@
 var screenWidth = window.innerWidth;
 var screenHeight = window.innerHeight;
+var step = 0;
+var rotationSpeed;
+var bouncingSpeed;
+var controls = new function(){
+  this.rotationSpeed = .02;
+  this.bouncingSpeed = .03;
+}
 
 /* ---------------------------- Functions ---------------------------- */
 
@@ -15,12 +22,19 @@ function initStats(){
 
 function render(){
   stats.update();
-  cube.rotation.y += .05;
+  step += controls.bouncingSpeed;
+  sphere.position.x = 20 + (10 * Math.cos(step));
+  sphere.position.y = 2 + (10 * Math.abs(Math.sin(step)));
+  cube.rotation.y += controls.rotationSpeed;
   requestAnimationFrame(render);
   renderer.render(scene, camera);
 }
 
 /* ------------------------------ Scene ------------------------------ */
+
+var gui = new dat.GUI();
+gui.add(controls, "rotationSpeed", 0, .5);
+gui.add(controls, "bouncingSpeed", 0, .5);
 
 /**
  * Scene initialized. 
