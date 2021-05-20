@@ -91,6 +91,7 @@ var controls = new function(){
   this.numberOfObjects = scene.children.length;
   this.rotationSpeed = .02;
   this.maxSize = 3;
+  this.autoAddCube = false;
   this.addCube = function(){
     var cubeSize = Math.ceil(Math.random() * this.maxSize);
     var cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
@@ -118,12 +119,21 @@ var controls = new function(){
   }
 }
 
+
 var gui = new dat.GUI();
 gui.add(controls, "rotationSpeed", 0, .5);
 gui.add(controls, "addCube");
 gui.add(controls, "removeCube");
 gui.add(controls, "numberOfObjects").listen();
 gui.add(controls, "maxSize", 3, 8);
+gui.add(controls, "autoAddCube").onChange(() => {
+  interval = setInterval(function(){
+    if (controls.autoAddCube){
+      controls.addCube();
+    }
+  }, 50);
+});
+gui.width = screenWidth / 3;
 
 /**
  * Render.
