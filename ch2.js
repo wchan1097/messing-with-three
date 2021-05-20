@@ -1,13 +1,6 @@
 var screenWidth = window.innerWidth;
 var screenHeight = window.innerHeight;
 var step = 0;
-var rotationSpeed;
-var controls = new function(){
-  this.rotationSpeed = .02;
-  this.addCube = function(){
-    
-  }
-}
 
 /* ---------------------------- Functions ---------------------------- */
 
@@ -23,24 +16,26 @@ function initStats(){
 
 function render(){
   stats.update();
+  let regex = new RegExp('^cube-[\d]*');
+  scene.traverse((element) => {
+    if (regex.test(element.name)){
+      element.rotation.x += controls.rotationSpeed;
+      element.rotation.y += controls.rotationSpeed;
+      element.rotation.z += controls.rotationSpeed;
+    }
+  })
   requestAnimationFrame(render);
   renderer.render(scene, camera);
 }
 
 /* ------------------------------ Scene ------------------------------ */
 
-var gui = new dat.GUI();
-gui.add(controls, "rotationSpeed", 0, .5);
-gui.add(controls, "addCube");
-
 /**
  * Scene initialized. 
  */
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(
-  45, screenWidth / screenHeight, .1, 1000
-);
+var camera = new THREE.PerspectiveCamera(45, screenWidth / screenHeight, .1, 1000 );
 var renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(new THREE.Color("rgb(200, 200, 200)"));
 renderer.setSize(screenWidth, screenHeight);
@@ -67,10 +62,10 @@ plane.position.z = 0;
  */
 
  var spotLight = new THREE.SpotLight(0xffffff);
- spotLight.position.set(-40, 60, -10);
+ spotLight.position.set(-40, 40, -10);
  spotLight.castShadow = true;
 
- var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+ var ambientLight = new THREE.AmbientLight(new THREE.Color("rgb(50,50,50)"));
 
 /**
  * Adding elements to scene. 
@@ -91,6 +86,44 @@ camera.position.z= 50;
 
 camera.lookAt(scene.position);
 var stats = initStats();
+
+var controls = new function(){
+  this.numberOfObjects = scene.children.length;
+  this.rotationSpeed = .02;
+  this.maxSize = 3;
+  this.addCube = function(){
+    var cubeSize = Math.ceil(Math.random() * this.maxSize);
+    var cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    var cubeColor = `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`;
+    var cubeMaterial = new THREE.MeshLambertMaterial(
+      {color: new THREE.Color(cubeColor)}
+    );
+    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+    cube.castShadow = true;
+    cube.name = "cube-" + scene.children.length;
+    cube.position.x = -20 + Math.round(Math.random() * planeGeometry.parameters.width);
+    cube.position.y = (cubeSize / 2) + Math.round(Math.random() * 5);
+    cube.position.z = -20 + Math.round(Math.random() * planeGeometry.parameters.height);
+    scene.add(cube);
+    this.numberOfObjects = scene.children.length;
+  }
+  this.removeCube = function(){
+    var allChildren = scene.children;
+    var lastObject = allChildren[allChildren.length - 1];
+    if (lastObject instanceof THREE.Mesh){
+      scene.remove(lastObject);
+      this.numberOfObjects = scene.children.length;
+    }
+  }
+}
+
+var gui = new dat.GUI();
+gui.add(controls, "rotationSpeed", 0, .5);
+gui.add(controls, "addCube");
+gui.add(controls, "removeCube");
+gui.add(controls, "numberOfObjects").listen();
+gui.add(controls, "maxSize", 3, 8);
 
 /**
  * Render.
